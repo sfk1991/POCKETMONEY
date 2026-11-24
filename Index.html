@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pocket Money</title>
+<style>
+:root{
+  --bg:#f4f5ef;--paper:#fffefa;--green:#718777;--dark:#34483b;
+  --sage:#dce6dc;--muted:#89948a;--line:#e8ebe3;--orange:#d69b68;
+  --shadow:0 8px 28px #34483b12;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--dark);font-family:Arial,sans-serif}
+button,input,select{font:inherit}
+button{cursor:pointer;border:0}
+.hidden{display:none!important}
+.app{max-width:1100px;margin:auto;padding:22px}
+header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.logo{font-size:23px;font-weight:800;letter-spacing:-1px}
+.logo span{color:var(--green)}
+.small{font-size:13px;color:var(--muted)}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:20px;box-shadow:var(--shadow)}
+.auth-wrap{max-width:440px;margin:7vh auto}
+.auth-wrap .card{padding:30px}
+h1{font-size:27px;margin:0 0 8px}
+h2{font-size:19px;margin:0 0 16px}
+h3{font-size:16px;margin:0 0 12px}
+.field{margin:15px 0}
+label{display:block;font-size:13px;font-weight:700;margin-bottom:7px}
+input,select{width:100%;padding:13px;border:1px solid var(--line);border-radius:12px;background:#fffefa;color:var(--dark);outline:none}
+input:focus,select:focus{border-color:var(--green)}
+.btn{background:var(--green);color:white;padding:12px 17px;border-radius:12px;font-weight:700}
+.btn:disabled{opacity:.6;cursor:wait}
+.btn.secondary{background:var(--sage);color:var(--dark)}
+.btn.light{background:#f1f2ec;color:var(--dark)}
+.btn.danger{background:#f8e9e5;color:#995b4e}
+.btn.full{width:100%}
+.link{background:none;color:var(--green);font-weight:700;padding:8px}
+.message{font-size:13px;margin-top:10px;min-height:18px;color:#a65d4f}
+.loading{font-size:13px;color:var(--green);margin-top:9px}
+.auth-extra{margin-top:14px;padding:15px;background:#f1f4ee;border-radius:14px}
+.auth-extra h2{margin-bottom:8px}
+.auth-extra .small{line-height:1.5}
+nav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+nav button{padding:11px 16px;border-radius:12px;background:#e9ede6;color:var(--dark);font-weight:700}
+nav button.active{background:var(--green);color:white}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin-bottom:17px}
+.stat{background:var(--sage);padding:18px;border-radius:17px}
+.stat strong{display:block;font-size:20px;margin-top:9px}
+.stat span{font-size:12px;color:#647668}
+.section{display:none}
+.section.active{display:block}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.item{padding:13px 0;border-bottom:1px solid var(--line)}
+.item:last-child{border:0}
+.amount{font-weight:800}
+.muted{color:var(--muted);font-size:12px}
+.progress{height:9px;background:#e9ede6;border-radius:20px;overflow:hidden;margin:12px 0}
+.progress div{height:100%;background:var(--green);border-radius:20px}
+.bar-row{display:grid;grid-template-columns:100px 1fr 85px;gap:9px;align-items:center;margin:13px 0;font-size:12px}
+.bar{height:12px;background:#edf0e9;border-radius:20px;overflow:hidden}
+.bar div{height:100%;background:var(--green);border-radius:20px}
+.empty{text-align:center;color:var(--muted);padding:24px 8px;font-size:13px}
+.buddy-launch{position:fixed;right:18px;bottom:18px;z-index:20;background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:9px 14px;box-shadow:var(--shadow);display:flex;align-items:center;gap:9px;color:var(--dark);font-weight:700}
+.buddy-launch svg{width:48px;height:48px}
+.buddy-panel{position:fixed;z-index:30;right:18px;bottom:90px;width:min(360px,calc(100vw - 36px));max-height:80vh;overflow:auto;background:var(--paper);border:1px solid var(--line);border-radius:22px;padding:18px;box-shadow:0 15px 50px #24372b30}
+.buddy-head{display:flex;align-items:center;gap:12px}
+.buddy-head svg{width:82px;height:82px;flex:none}
+.buddy-name{font-weight:800;font-size:17px}
+.buddy-speech{background:#eef2eb;border-radius:15px;padding:13px;margin:12px 0;font-size:13px;line-height:1.5}
+.buddy-controls{display:flex;gap:7px;flex-wrap:wrap}
+.buddy-controls button{font-size:12px;padding:9px 11px;border-radius:10px;background:var(--sage);color:var(--dark);font-weight:700}
+.buddy-controls button.primary{background:var(--green);color:white}
+.buddy-choices{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
+.buddy-choice{border:1px solid var(--line);border-radius:13px;padding:8px;background:white;text-align:center;font-size:12px;color:var(--dark)}
+.buddy-choice svg{width:58px;height:58px;display:block;margin:auto}
+.buddy-choice.selected{border:2px solid var(--green);background:#f0f4ee}
+.step-dots{display:flex;gap:5px;margin:12px 0}
+.step-dots span{height:5px;flex:1;background:#e5e9e1;border-radius:9px}
+.step-dots span.done{background:var(--green)}
+@media(max-width:650px){
+ .app{padding:15px}.grid{grid-template-columns:1fr}
+ .stats{grid-template-columns:1fr 1fr}.stat:last-child{grid-column:span 2}
+ header{align-items:flex-start}.logo{font-size:20px}
+ .card{padding:16px}
+}
+</style>
+</head>
+<body>
+
+<div id="auth" class="auth-wrap app">
+  <header><div class="logo">Pocket<span>Money</span></div><span class="small">Kelola uangmu</span></header>
+  <div class="card">
+    <div id="registerBox">
+      <h1>Buat akunmu 🌿</h1>
+      <p class="small">Mulai atur pengeluaran dan tabunganmu.</p>
+      <form id="registerForm">
+        <div class="field"><label>Nama</label><input id="regName" required placeholder="Nama kamu"></div>
+        <div class="field"><label>Email</label><input id="regEmail" type="email" required placeholder="nama@email.com"></div>
+        <div class="field">
+          <label>Password</label>
+          <div class="row">
+            <input id="regPassword" type="password" required minlength="6" placeholder="Minimal 6 karakter">
+            <button type="button" class="link" onclick="togglePassword('regPassword',this)">Tampilkan</button>
+          </div>
+        </div>
+        <button class="btn full" id="registerBtn">Daftar</button>
+        <div id="registerLoading" class="loading hidden">Sedang membuat akun...</div>
+        <div id="registerMessage" class="message"></div>
+      </form>
+      <p class="small">Sudah punya akun? <button type="button" class="link" onclick="showLogin()">Login</button></p>
+    </div>
+
+    <div id="loginBox" class="hidden">
+      <h1>Selamat datang kembali</h1>
+      <p class="small">Masuk untuk melihat catatan uangmu.</p>
+      <form id="loginForm">
+        <div class="field"><label>Email</label><input id="loginEmail" type="email" required placeholder="nama@email.com"></div>
+        <div class="field">
+          <label>Password</label>
+          <div class="row">
+            <input id="loginPassword" type="password" required placeholder="Password">
+            <button type="button" class="link" onclick="togglePassword('loginPassword',this)">Tampilkan</button>
+          </div>
+        </div>
+        <button class="btn full" id="loginBtn">Login</button>
+        <div id="loginLoading" class="loading hidden">Sedang masuk...</div>
+        <div id="loginMessage" class="message"></div>
+      </form>
+
+      <button class="link" type="button" onclick="showForgotPassword()">Lupa Password?</button>
+
+      <div id="forgotBox" class="auth-extra hidden">
+        <h2>Lupa Password?</h2>
+        <p class="small">Masukkan email akunmu untuk menerima kode verifikasi.</p>
+        <div class="field">
+          <label>Email</label>
+          <input id="forgotEmail" type="email" placeholder="nama@email.com">
+        </div>
+        <button class="btn full" id="sendOtpBtn" type="button" onclick="sendOtp()">Kirim Kode OTP</button>
+        <div id="otpLoading" class="loading hidden">Mengirim kode...</div>
+        <div id="forgotMessage" class="message"></div>
+
+        <div id="otpBox" class="hidden">
+          <div class="field">
+            <label>Kode OTP</label>
+            <input id="otpInput" inputmode="numeric" maxlength="6" placeholder="Masukkan 6 digit kode">
+          </div>
+          <button class="btn full" type="button" onclick="verifyOtp()">Verifikasi Kode</button>
+        </div>
+
+        <div id="newPasswordBox" class="hidden">
+          <div class="field">
+            <label>Password Baru</label>
+            <input id="newPassword" type="password" minlength="6" placeholder="Minimal 6 karakter">
+          </div>
+          <div class="field">
+            <label>Ulangi Password Baru</label>
+            <input id="confirmPassword" type="password" minlength="6" placeholder="Ulangi password">
+          </div>
+          <button class="btn full" type="button" onclick="saveNewPassword()">Simpan Password Baru</button>
+        </div>
+        <button class="link" type="button" onclick="closeForgotPassword()">Kembali ke Login</button>
+      </div>
+
+      <p class="small">Belum punya akun? <button type="button" class="link" onclick="showRegister()">Daftar</button></p>
+    </div>
+  </div>
+</div>
+
+<div id="mainApp" class="app hidden">
+  <header>
+    <div><div class="logo">Pocket<span>Money</span></div><div class="small" id="welcome">Halo!</div></div>
+    <button class="btn light" onclick="logout()">Keluar</button>
+  </header>
+
+  <nav>
+    <button class="active" data-tab="dashboard" onclick="openTab('dashboard',this)">Dashboard</button>
+    <button data-tab="expenses" onclick="openTab('expenses',this)">Pengeluaran</button>
+    <button data-tab="targets" onclick="openTab('targets',this)">Target</button>
+    <button data-tab="reports" onclick="openTab('reports',this)">Laporan</button>
+  </nav>
+
+  <section id="dashboard" class="section active">
+    <div class="stats">
+      <div class="stat"><span>Total pengeluaran</span><strong id="totalExpense">Rp0</strong></div>
+      <div class="stat"><span>Jumlah transaksi</span><strong id="totalTransactions">0</strong></div>
+      <div class="stat"><span>Target tabungan</span><strong id="totalTargets">0</strong></div>
+    </div>
+    <div class="grid">
+      <div class="card"><h2>Pengeluaran terbaru</h2><div id="recentList"></div></div>
+      <div class="card"><h2>Target tabungan</h2><div id="dashboardTargets"></div></div>
+    </div>
+  </section>
+
+  <section id="expenses" class="section">
+    <div class="grid">
+      <div class="card">
+        <h2>Tambah pengeluaran</h2>
+        <form id="expenseForm">
+          <div class="field"><label>Nama pengeluaran</label><input id="expenseName" required placeholder="Contoh: Makan siang"></div>
+          <div class="field"><label>Nominal (Rp)</label><input id="expenseAmount" type="number" min="1" required placeholder="Contoh: 15000"></div>
+          <div class="field"><label>Kategori</label><select id="expenseCategory"><option>Makanan</option><option>Transportasi</option><option>Sekolah</option><option>Hiburan</option><option>Lainnya</option></select></div>
+          <button class="btn" id="expenseBtn">Simpan pengeluaran</button>
+          <div id="expenseLoading" class="loading hidden">Menyimpan pengeluaran...</div>
+          <div id="expenseMessage" class="message"></div>
+        </form>
+      </div>
+      <div class="card"><h2>Catatan pengeluaran</h2><div id="allTransactions"></div></div>
+    </div>
+  </section>
+
+  <section id="targets" class="section">
+    <div class="grid">
+      <div class="card">
+        <h2>Buat target tabungan</h2>
+        <form id="targetForm">
+          <div class="field"><label>Nama target</label><input id="targetName" required placeholder="Contoh: Beli buku"></div>
+          <div class="field"><label>Nominal target (Rp)</label><input id="targetAmount" type="number" min="1" required placeholder="Contoh: 200000"></div>
+          <button class="btn" id="targetBtn">Buat target</button>
+          <div id="targetLoading" class="loading hidden">Membuat target...</div>
+          <div id="targetMessage" class="message"></div>
+        </form>
+      </div>
+      <div class="card"><h2>Daftar target</h2><div id="targetList"></div></div>
+    </div>
+  </section>
+
+  <section id="reports" class="section">
+    <div class="card"><h2>Pengeluaran berdasarkan kategori</h2><div id="categoryChart"></div></div>
+    <div class="card" style="margin-top:16px"><h2>Riwayat transaksi</h2><div id="reportTransactions"></div></div>
+  </section>
+
+  <button class="buddy-launch" onclick="toggleBuddy()">
+    <span id="buddyLauncherFace"></span><span>Guide Buddy</span>
+  </button>
+
+  <div id="buddyPanel" class="buddy-panel hidden">
+    <div class="row"><strong>Guide Buddy 🌱</strong><button class="link" onclick="toggleBuddy()">✕</button></div>
+    <div class="buddy-head">
+      <div id="buddyFace"></div>
+      <div><div class="buddy-name" id="buddyDisplayName">Bubu</div><div class="small">Teman panduan Pocket Money</div></div>
+    </div>
+    <div class="buddy-speech" id="buddyMessage" aria-live="polite">Hai! Aku akan bantu kamu mengenal Pocket Money.</div>
+    <div class="buddy-controls">
+      <button class="primary" onclick="speakBuddy()">🔊 Dengarkan</button>
+      <button onclick="pauseBuddy()">⏸ Jeda</button>
+      <button onclick="stopBuddy()">⏹ Berhenti</button>
+    </div>
+    <div class="step-dots" id="stepDots"></div>
+    <div class="row">
+      <button class="btn secondary" onclick="previousStep()">← Kembali</button>
+      <button class="btn" onclick="nextStep()" id="nextStepBtn">Lanjut →</button>
+    </div>
+    <h3 style="margin-top:18px">Pilih karakter</h3>
+    <div class="buddy-choices" id="buddyChoices"></div>
+    <div class="field"><label>Nama karakter</label><input id="buddyCustomName" maxlength="18" placeholder="Beri nama karakter"></div>
+    <button class="btn secondary full" onclick="saveBuddyName()">Simpan nama</button>
+    <div class="field">
+      <label><input id="autoSpeak" type="checkbox" style="width:auto;vertical-align:middle"> Bacakan panduan otomatis</label>
+    </div>
+  </div>
+</div>
+
+<script>
+let token = localStorage.getItem('pocketMoneyToken') || '';
+let appData = {name:'',transactions:[],targets:[]};
+let buddyType = localStorage.getItem('buddyType') || 'bubu';
+let buddyName = localStorage.getItem('buddyName') || '';
+let currentStep = 0;
+let autoSpeak = localStorage.getItem('buddyAutoSpeak') === 'true';
+let resetToken = '';
+
+const money = n => 'Rp' + Number(n || 0).toLocaleString('id-ID');
+const $ = id => document.getElementById(id);
+
+function togglePassword(id,button){
+  const input = $(id);
+  input.type = input.type === 'password' ? 'text' : 'password';
+  button.textContent = input.type === 'password' ? 'Tampilkan' : 'Sembunyikan';
+}
+
+function showLogin(){
+  $('registerBox').classList.add('hidden');
+  $('loginBox').classList.remove('hidden');
+}
+
+function showRegister(){
+  closeForgotPassword();
+  $('loginBox').classList.add('hidden');
+  $('registerBox').classList.remove('hidden');
+}
+
+function showAuth(){
+  $('mainApp').classList.add('hidden');
+  $('auth').classList.remove('hidden');
+  $('loginBox').classList.add('hidden');
+  $('registerBox').classList.remove('hidden');
+  closeForgotPassword();
+  stopBuddy();
+}
+
+function showForgotPassword(){
+  $('forgotBox').classList.remove('hidden');
+  $('otpBox').classList.add('hidden');
+  $('newPasswordBox').classList.add('hidden');
+  $('forgotEmail').value = $('loginEmail').value.trim();
+  $('forgotMessage').textContent = '';
+  $('otpInput').value = '';
+  $('newPassword').value = '';
+  $('confirmPassword').value = '';
+  resetToken = '';
+}
+
+function closeForgotPassword(){
+  $('forgotBox').classList.add('hidden');
+  $('otpBox').classList.add('hidden');
+  $('newPasswordBox').classList.add('hidden');
+  $('forgotMessage').textContent = '';
+  resetToken = '';
+}
+
+function setLoading(buttonId,loadingId,on){
+  $(buttonId).disabled = on;
+  $(loadingId).classList.toggle('hidden',!on);
+}
+
+function callServer(method,args,onSuccess,onFailure){
+  const runner = google.script.run
+    .withSuccessHandler(onSuccess)
+    .withFailureHandler(err=>onFailure(err));
+  runner[method](...args);
+}
+
+/* DAFTAR */
+$('registerForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  setLoading('registerBtn','registerLoading',true);
+  $('registerMessage').textContent='';
+  const data={
+    name:$('regName').value.trim(),
+    email:$('regEmail').value.trim(),
+    password:$('regPassword').value
+  };
+  callServer('registerUser',[data],res=>{
+    setLoading('registerBtn','registerLoading',false);
+    if(!res.success){$('registerMessage').textContent=res.message;return;}
+    token=res.token;
+    localStorage.setItem('pocketMoneyToken',token);
+    loadData();
+  },err=>{
+    setLoading('registerBtn','registerLoading',false);
+    $('registerMessage').textContent=err.message;
+  });
+});
+
+/* LOGIN */
+$('loginForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  setLoading('loginBtn','loginLoading',true);
+  $('loginMessage').textContent='';
+  const data={
+    email:$('loginEmail').value.trim(),
+    password:$('loginPassword').value
+  };
+  callServer('loginUser',[data],res=>{
+    setLoading('loginBtn','loginLoading',false);
+    if(!res.success){$('loginMessage').textContent=res.message;return;}
+    token=res.token;
+    localStorage.setItem('pocketMoneyToken',token);
+    loadData();
+  },err=>{
+    setLoading('loginBtn','loginLoading',false);
+    $('loginMessage').textContent=err.message;
+  });
+});
+
+/* LUPA PASSWORD */
+function sendOtp(){
+  const email=$('forgotEmail').value.trim();
+  if(!email){
+    $('forgotMessage').textContent='Masukkan email terlebih dahulu.';
+    return;
+  }
+
+  $('sendOtpBtn').disabled=true;
+  $('otpLoading').classList.remove('hidden');
+  $('forgotMessage').textContent='';
+
+  callServer('requestPasswordReset',[email],res=>{
+    $('sendOtpBtn').disabled=false;
+    $('otpLoading').classList.add('hidden');
+    $('forgotMessage').textContent=res.message;
+    if(res.success){
+      $('otpBox').classList.remove('hidden');
+    }
+  },err=>{
+    $('sendOtpBtn').disabled=false;
+    $('otpLoading').classList.add('hidden');
+    $('forgotMessage').textContent=err.message;
+  });
+}
+
+function verifyOtp(){
+  const email=$('forgotEmail').value.trim();
+  const otp=$('otpInput').value.trim();
+
+  if(!otp){
+    $('forgotMessage').textContent='Masukkan kode OTP.';
+    return;
+  }
+
+  callServer('verifyPasswordReset',[email,otp],res=>{
+    $('forgotMessage').textContent=res.message;
+    if(res.success){
+      resetToken=res.resetToken;
+      $('otpBox').classList.add('hidden');
+      $('newPasswordBox').classList.remove('hidden');
+    }
+  },err=>{
+    $('forgotMessage').textContent=err.message;
+  });
+}
+
+function saveNewPassword(){
+  const email=$('forgotEmail').value.trim();
+  const password=$('newPassword').value;
+  const confirm=$('confirmPassword').value;
+
+  if(password.length<6){
+    $('forgotMessage').textContent='Password minimal 6 karakter.';
+    return;
+  }
+  if(password!==confirm){
+    $('forgotMessage').textContent='Konfirmasi password tidak sama.';
+    return;
+  }
+  if(!resetToken){
+    $('forgotMessage').textContent='Silakan verifikasi kode OTP terlebih dahulu.';
+    return;
+  }
+
+  callServer('resetPassword',[email,resetToken,password],res=>{
+    $('forgotMessage').textContent=res.message;
+    if(res.success){
+      resetToken='';
+      $('loginEmail').value=email;
+      $('loginPassword').value='';
+      $('forgotBox').classList.add('hidden');
+      $('newPasswordBox').classList.add('hidden');
+      $('otpBox').classList.add('hidden');
+      $('loginMessage').textContent='Password berhasil diubah. Silakan login dengan password baru.';
+    }
+  },err=>{
+    $('forgotMessage').textContent=err.message;
+  });
+}
+
+/* DATA */
+function loadData(){
+  if(!token){showAuth();return;}
+  $('auth').classList.add('hidden');
+  $('mainApp').classList.remove('hidden');
+  $('welcome').textContent='Memuat data...';
+  callServer('getUserData',[token],res=>{
+    if(!res.success){
+      localStorage.removeItem('pocketMoneyToken');
+      token='';
+      showAuth();
+      $('loginMessage').textContent=res.message || 'Silakan login kembali.';
+      return;
+    }
+    appData=res.data;
+    renderAll();
+  },err=>{
+    $('welcome').textContent='Gagal memuat data';
+    alert(err.message);
+  });
+}
+
+function openTab(id,button){
+  document.querySelectorAll('.section').forEach(x=>x.classList.remove('active'));
+  $(id).classList.add('active');
+  document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));
+  button.classList.add('active');
+  setBuddyMessage('Kamu sedang membuka bagian '+id+'. Pilih menu lain jika ingin berpindah halaman.');
+}
+
+function renderAll(){
+  $('welcome').textContent='Halo, '+appData.name+' 👋';
+  const tx=appData.transactions.slice().sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const total=tx.reduce((sum,t)=>sum+Number(t.amount),0);
+  $('totalExpense').textContent=money(total);
+  $('totalTransactions').textContent=tx.length;
+  $('totalTargets').textContent=appData.targets.length;
+
+  $('recentList').innerHTML=tx.length
+    ?tx.slice(0,5).map(transactionHTML).join('')
+    :'<div class="empty">Belum ada pengeluaran.</div>';
+
+  $('allTransactions').innerHTML=tx.length
+    ?tx.map(transactionHTML).join('')
+    :'<div class="empty">Belum ada transaksi.</div>';
+
+  $('reportTransactions').innerHTML=tx.length
+    ?tx.map(transactionHTML).join('')
+    :'<div class="empty">Belum ada transaksi.</div>';
+
+  renderTargets();
+  renderChart();
+}
+
+function transactionHTML(t){
+  const date=new Date(t.date);
+  const dateText=isNaN(date.getTime())?'':date.toLocaleDateString('id-ID');
+  return `<div class="item row">
+    <div><strong>${escapeHTML(t.name)}</strong>
+      <div class="muted">${escapeHTML(t.category)} · ${dateText}</div>
+    </div>
+    <div style="text-align:right">
+      <div class="amount">${money(t.amount)}</div>
+      <button class="link" onclick="deleteTransaction('${t.id}')">Hapus</button>
+    </div>
+  </div>`;
+}
+
+function renderTargets(){
+  const targets=appData.targets;
+  if(!targets.length){
+    $('targetList').innerHTML='<div class="empty">Belum ada target tabungan.</div>';
+    $('dashboardTargets').innerHTML='<div class="empty">Belum ada target tabungan.</div>';
+    return;
+  }
+  $('targetList').innerHTML=targets.map(targetHTML).join('');
+  $('dashboardTargets').innerHTML=targets.slice(0,3).map(t=>{
+    const pct=Math.min(100,t.target?t.saved/t.target*100:0);
+    return `<div class="item">
+      <div class="row"><strong>${escapeHTML(t.name)}</strong><span class="muted">${Math.round(pct)}%</span></div>
+      <div class="progress"><div style="width:${pct}%"></div></div>
+      <div class="muted">${money(t.saved)} dari ${money(t.target)}</div>
+    </div>`;
+  }).join('');
+}
+
+function targetHTML(t){
+  const pct=Math.min(100,t.target?t.saved/t.target*100:0);
+  return `<div class="item">
+    <div class="row"><strong>${escapeHTML(t.name)}</strong><strong>${Math.round(pct)}%</strong></div>
+    <div class="progress"><div style="width:${pct}%"></div></div>
+    <div class="muted">${money(t.saved)} terkumpul dari ${money(t.target)}</div>
+    <div class="row" style="margin-top:12px">
+      <input id="saving-${t.id}" type="number" min="1" placeholder="Nominal tabungan" style="max-width:180px">
+      <button class="btn" onclick="addSaving('${t.id}')">Tambah</button>
+    </div>
+    <div class="muted" id="savingMessage-${t.id}"></div>
+  </div>`;
+}
+
+function renderChart(){
+  const totals={};
+  appData.transactions.forEach(t=>{
+    const cat=t.category||'Lainnya';
+    totals[cat]=(totals[cat]||0)+Number(t.amount);
+  });
+  const entries=Object.entries(totals);
+  if(!entries.length){
+    $('categoryChart').innerHTML='<div class="empty">Diagram akan muncul setelah kamu mencatat pengeluaran.</div>';
+    return;
+  }
+  const max=Math.max(...entries.map(x=>x[1]));
+  $('categoryChart').innerHTML=entries.map(([cat,val])=>`
+    <div class="bar-row">
+      <span>${escapeHTML(cat)}</span>
+      <div class="bar"><div style="width:${val/max*100}%"></div></div>
+      <strong>${money(val)}</strong>
+    </div>`).join('');
+}
+
+/* FORM PENGELUARAN */
+$('expenseForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  setLoading('expenseBtn','expenseLoading',true);
+  $('expenseMessage').textContent='';
+  const data={
+    type:'expense',
+    name:$('expenseName').value.trim(),
+    amount:Number($('expenseAmount').value),
+    category:$('expenseCategory').value
+  };
+  callServer('saveTransaction',[data,token],res=>{
+    setLoading('expenseBtn','expenseLoading',false);
+    if(!res.success){$('expenseMessage').textContent=res.message;return;}
+    $('expenseForm').reset();
+    $('expenseMessage').textContent='Pengeluaran berhasil disimpan.';
+    loadData();
+  },err=>{
+    setLoading('expenseBtn','expenseLoading',false);
+    $('expenseMessage').textContent=err.message;
+  });
+});
+
+/* FORM TARGET */
+$('targetForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  setLoading('targetBtn','targetLoading',true);
+  $('targetMessage').textContent='';
+  const data={
+    name:$('targetName').value.trim(),
+    target:Number($('targetAmount').value)
+  };
+  callServer('saveTarget',[data,token],res=>{
+    setLoading('targetBtn','targetLoading',false);
+    if(!res.success){$('targetMessage').textContent=res.message;return;}
+    $('targetForm').reset();
+    $('targetMessage').textContent='Target berhasil dibuat.';
+    loadData();
+  },err=>{
+    setLoading('targetBtn','targetLoading',false);
+    $('targetMessage').textContent=err.message;
+  });
+});
+
+function addSaving(id){
+  const input=$('saving-'+id);
+  const amount=Number(input.value);
+  const msg=$('savingMessage-'+id);
+  if(!amount||amount<=0){msg.textContent='Masukkan nominal yang benar.';return;}
+  msg.textContent='Menyimpan tabungan...';
+  callServer('addSaving',[id,amount,token],res=>{
+    if(!res.success){msg.textContent=res.message;return;}
+    loadData();
+  },err=>msg.textContent=err.message);
+}
+
+function deleteTransaction(id){
+  if(!confirm('Hapus transaksi ini?'))return;
+  callServer('removeTransaction',[id,token],res=>{
+    if(!res.success){alert(res.message);return;}
+    loadData();
+  },err=>alert(err.message));
+}
+
+function logout(){
+  if(!confirm('Keluar dari akun?'))return;
+  stopBuddy();
+  const oldToken=token;
+  localStorage.removeItem('pocketMoneyToken');
+  token='';
+  callServer('revokeSession',[oldToken],()=>showAuth(),()=>showAuth());
+}
+
+function escapeHTML(value){
+  return String(value).replace(/[&<>"']/g,ch=>({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[ch]));
+}
+
+/* GUIDE BUDDY */
+const buddyCharacters={
+  bubu:{name:'Bubu',type:'bear',color:'#b98e70'},
+  lulu:{name:'Lulu',type:'bunny',color:'#d8a5a8'},
+  mimi:{name:'Mimi',type:'cat',color:'#9b9da9'},
+  panda:{name:'Panda',type:'panda',color:'#555b59'},
+  kiko:{name:'Kiko',type:'frog',color:'#85a987'},
+  foxy:{name:'Foxy',type:'fox',color:'#d58c58'}
+};
+
+function buddySVG(key){
+  const c=buddyCharacters[key]||buddyCharacters.bubu;
+  let ears='';
+  if(c.type==='bunny') ears='<ellipse cx="34" cy="20" rx="10" ry="24" fill="'+c.color+'"/><ellipse cx="66" cy="20" rx="10" ry="24" fill="'+c.color+'"/>';
+  else if(c.type==='cat') ears='<path d="M23 35 L20 7 L44 25 M56 25 L80 7 L77 35" fill="'+c.color+'" stroke="'+c.color+'" stroke-width="4" stroke-linejoin="round"/>';
+  else if(c.type==='bear') ears='<circle cx="29" cy="28" r="13" fill="'+c.color+'"/><circle cx="71" cy="28" r="13" fill="'+c.color+'"/>';
+  else if(c.type==='panda') ears='<circle cx="29" cy="28" r="13" fill="#333"/><circle cx="71" cy="28" r="13" fill="#333"/>';
+  else if(c.type==='frog') ears='<circle cx="30" cy="24" r="14" fill="'+c.color+'"/><circle cx="70" cy="24" r="14" fill="'+c.color+'"/>';
+  else ears='<path d="M22 38 L15 7 L44 27 M58 27 L85 7 L78 38" fill="'+c.color+'" stroke="'+c.color+'" stroke-width="4"/>';
+  const face=c.type==='panda'
+    ?'<ellipse cx="39" cy="49" rx="8" ry="11" fill="#333"/><ellipse cx="61" cy="49" rx="8" ry="11" fill="#333"/>'
+    :'<circle cx="39" cy="49" r="4" fill="#34483b"/><circle cx="61" cy="49" r="4" fill="#34483b"/>';
+  return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${c.name}">
+    ${ears}
+    <ellipse cx="50" cy="58" rx="34" ry="33" fill="${c.color}"/>
+    ${face}
+    <ellipse cx="50" cy="65" rx="13" ry="9" fill="#f5e7d8"/>
+    <path d="M46 65 Q50 70 54 65" fill="none" stroke="#765c54" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="27" cy="62" r="5" fill="#e9a7a0" opacity=".65"/>
+    <circle cx="73" cy="62" r="5" fill="#e9a7a0" opacity=".65"/>
+  </svg>`;
+}
+
+const guideSteps=[
+  {title:'Kenalan dengan Dashboard',text:'Ini adalah halaman utama Pocket Money. Di sini kamu bisa melihat total pengeluaran, jumlah transaksi, dan target tabunganmu.'},
+  {title:'Catat Pengeluaran',text:'Masuk ke menu Pengeluaran untuk mencatat uang yang kamu keluarkan. Isi nama, nominal, dan kategori, lalu tekan Simpan.'},
+  {title:'Buat Target Tabungan',text:'Di menu Target, kamu bisa membuat tujuan menabung. Masukkan nama target dan jumlah uang yang ingin dikumpulkan.'},
+  {title:'Tambahkan Tabungan',text:'Kalau kamu sudah menabung, masukkan nominalnya di target yang sesuai lalu tekan Tambah. Progres tabungan akan diperbarui.'},
+  {title:'Lihat Laporan',text:'Menu Laporan menampilkan diagram pengeluaran berdasarkan kategori dan riwayat transaksi.'},
+  {title:'Selesai!',text:'Sekarang kamu sudah mengenal fitur utama Pocket Money. Yuk, mulai catat pengeluaranmu dengan teratur!'}
+];
+
+function setBuddyMessage(text){
+  $('buddyMessage').textContent=text;
+}
+
+function renderBuddy(){
+  const key=buddyType;
+  const character=buddyCharacters[key]||buddyCharacters.bubu;
+  const display=buddyName.trim()||character.name;
+  $('buddyFace').innerHTML=buddySVG(key);
+  $('buddyLauncherFace').innerHTML=buddySVG(key);
+  $('buddyDisplayName').textContent=display;
+  $('buddyCustomName').value=buddyName;
+  $('autoSpeak').checked=autoSpeak;
+  $('buddyChoices').innerHTML=Object.entries(buddyCharacters).map(([id,c])=>`
+    <button class="buddy-choice ${id===key?'selected':''}" onclick="selectBuddy('${id}')">
+      ${buddySVG(id)}${c.name}
+    </button>`).join('');
+  renderStep();
+}
+
+function selectBuddy(key){
+  buddyType=key;
+  localStorage.setItem('buddyType',key);
+  renderBuddy();
+  setBuddyMessage('Hai! Aku '+(buddyName||buddyCharacters[key].name)+'. Senang menemanimu menggunakan Pocket Money!');
+  if(autoSpeak)speakBuddy();
+}
+
+function saveBuddyName(){
+  buddyName=$('buddyCustomName').value.trim();
+  localStorage.setItem('buddyName',buddyName);
+  renderBuddy();
+  setBuddyMessage('Namaku sekarang '+(buddyName||buddyCharacters[buddyType].name)+'. Ayo lanjut belajar!');
+}
+
+function renderStep(){
+  const step=guideSteps[currentStep];
+  setBuddyMessage(step.title+'. '+step.text);
+  $('stepDots').innerHTML=guideSteps.map((s,i)=>`<span class="${i<=currentStep?'done':''}"></span>`).join('');
+  $('nextStepBtn').textContent=currentStep===guideSteps.length-1?'Ulangi ↻':'Lanjut →';
+}
+
+function nextStep(){
+  currentStep=currentStep===guideSteps.length-1?0:currentStep+1;
+  renderStep();
+  if(autoSpeak)speakBuddy();
+}
+
+function previousStep(){
+  currentStep=Math.max(0,currentStep-1);
+  renderStep();
+  if(autoSpeak)speakBuddy();
+}
+
+function toggleBuddy(){
+  $('buddyPanel').classList.toggle('hidden');
+}
+
+$('autoSpeak').addEventListener('change',e=>{
+  autoSpeak=e.target.checked;
+  localStorage.setItem('buddyAutoSpeak',String(autoSpeak));
+});
+
+/* SUARA GUIDE BUDDY */
+function speakBuddy(){
+  const text=$('buddyMessage').innerText;
+  if(!('speechSynthesis' in window)){
+    alert('Browser ini belum mendukung fitur suara.');
+    return;
+  }
+  window.speechSynthesis.cancel();
+  const utterance=new SpeechSynthesisUtterance(text);
+  utterance.lang='id-ID';
+  utterance.rate=1.05;
+  utterance.pitch=1.3;
+  utterance.volume=1;
+  const voices=window.speechSynthesis.getVoices();
+  const indonesianVoice=voices.find(v=>v.lang&&v.lang.toLowerCase().startsWith('id'));
+  if(indonesianVoice)utterance.voice=indonesianVoice;
+  window.speechSynthesis.speak(utterance);
+}
+
+function pauseBuddy(){
+  if('speechSynthesis' in window&&window.speechSynthesis.speaking){
+    window.speechSynthesis.pause();
+  }
+}
+
+function stopBuddy(){
+  if('speechSynthesis' in window){
+    window.speechSynthesis.cancel();
+  }
+}
+
+/* INITIALIZE */
+renderBuddy();
+
+if(token){
+  loadData();
+}else{
+  showAuth();
+}
+</script>
+</body>
+</html>
